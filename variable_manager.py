@@ -1,5 +1,27 @@
+# variable_manager_simple.py
+
+import json
+import os
+
+DB_PATH = "variables.json"
+
+def load_vars():
+    """Load saved variables (or return empty dict)."""
+    if os.path.exists(DB_PATH):
+        try:
+            with open(DB_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+def save_vars(data):
+    """Save variables to disk."""
+    with open(DB_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
 def main():
-    variables = {}
+    variables = load_vars()
 
     while True:
         print("\n--- Variable Manager ---")
@@ -8,35 +30,36 @@ def main():
         print("3. Get variable value")
         print("4. Exit")
 
-        choice = input("Enter your choice: ")
+        choice = input("Choose: ").strip()
 
         if choice == "1":
-            name = input("Enter variable name: ")
-            value = input("Enter variable value: ")
-            variables[name] = value
-            print(f"Added '{name}' = {value}")
+            name = input("Variable name: ").strip()
+            value = input("Variable value: ").strip()
+            variables[name] = value          # store as strings (simple!)
+            save_vars(variables)             # persist immediately
+            print(f"Saved: {name} = {value}")
 
         elif choice == "2":
             if not variables:
-                print("No variables stored.")
+                print("(no variables yet)")
             else:
                 print("\nStored variables:")
-                for name, value in variables.items():
-                    print(f"{name} = {value}")
+                for k, v in variables.items():
+                    print(f"{k} = {v}")
 
         elif choice == "3":
-            name = input("Enter variable name to look up: ")
+            name = input("Name to look up: ").strip()
             if name in variables:
                 print(f"{name} = {variables[name]}")
             else:
-                print(f"Variable '{name}' not found.")
+                print(f"'{name}' not found.")
 
         elif choice == "4":
-            print("Exiting program.")
+            print("Goodbye!")
             break
 
         else:
-            print("Invalid choice. Please try again.")
+            print("Invalid choice.")
 
 if __name__ == "__main__":
     main()
